@@ -17,3 +17,5 @@ build_Debug/
 compile_flags.txt
 Makefile
 **/build-Debug
+*.zip
+*.7z
