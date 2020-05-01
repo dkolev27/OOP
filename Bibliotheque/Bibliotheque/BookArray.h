@@ -21,7 +21,7 @@ public:
 	void setFilepath(const char* filepath);
 	 
 private:
-	BooksData** arr; 
+	BooksData** arr; //Контейнер за книги
 	int currentSize; 
 	int currentCount; 
 
