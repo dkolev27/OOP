@@ -1,50 +1,31 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
-#include "BooksData.h"
-#include "Commands.h"
+#include <string>
+#include "Manager.h"
+#include "Book.h"
 #include "BookArray.h"
 #include "UserArray.h"
 
-const int MAX_CMD_LINE_LEN = 128; 
+using namespace std;
 
-void commands()
+void Manager::commands()
 {
-	char line[MAX_CMD_LINE_LEN]; 
+	string line;
 	BookArray books; 
-	User user;
-	char* command;
+	string command;
 
 	do
 	{
 		std::cout << "> ";
-		std::cin.getline(line, MAX_CMD_LINE_LEN);
+		getline(cin, line);
+		size_t pos = line.find(" ");
+		cout << pos << endl;
+		/*
 		command = strtok(line, " "); //Функцията е взета от интернет
 		if (!command)
 		{
 			continue;
-		}
-		else if (strcmp(command, "login") == 0) // New
-		{
-			std::cout << "Enter username and password!" << std::endl;
-			char inputUsername[MAX_CMD_LINE_LEN];
-			char inputPassword[MAX_CMD_LINE_LEN];
-			std::cin.getline(inputUsername, MAX_CMD_LINE_LEN);
-			user.setUsername(inputUsername);
-			std::cin.getline(inputPassword, MAX_CMD_LINE_LEN);
-			user.setPassword(inputPassword);
-			std::ifstream file("users.txt");
-			if (file.is_open() == 0)
-			{
-				std::cout << "Error" << std::endl;
-			}
-			file >> user;
-			std::cout << user.getUsername() << " " << user.getPassword() << " " << user.getIsAdmin() << " " << user.getIsFound();
-			file.close();
-		}
-		else if (strcmp(command, "reg") == 0) // New
-		{
-
 		}
 		else if (strcmp(command, "open") == 0)
 		{
@@ -55,7 +36,7 @@ void commands()
 			}
 			else
 			{
-				std::cout << "Please input a filename!" << std::endl;
+				cout << "Please input a filename!" << std::endl;
 			}
 		}
 		else if (strcmp(command, "close") == 0)
@@ -89,7 +70,7 @@ void commands()
 		}
 		else if (strcmp(command, "booksAdd") == 0)
 		{
-			BooksData book;
+			Book book;
 			book.input();
 			books.addBook(book);
 		}
@@ -115,7 +96,7 @@ void commands()
 		else
 		{
 			std::cout << "Invalid command!" << std::endl;
-		}
+		}*/
 	} 
 	while (true);
 }

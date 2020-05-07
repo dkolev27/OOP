@@ -7,6 +7,7 @@ User::User()
 	username = nullptr;
 	password = nullptr;
 	isAdmin = false;
+	isFound = false;
 }
 
 User::User(const char* username, const char* password, bool isAdmin)
@@ -78,6 +79,11 @@ bool User::getIsAdmin() const
 	return isAdmin;
 }
 
+bool User::getIsFound() const
+{
+	return isFound;
+}
+
 void User::print() const
 {
 	std::cout << username << " " << password << " " << isAdmin << std::endl;
@@ -90,6 +96,7 @@ void User::copy(const User& other)
 	this->password = new char[strlen(other.password) + 1];
 	strcpy(this->password, other.password);
 	isAdmin = other.isAdmin;
+	isFound = other.isFound;
 }
 
 void User::clear()
@@ -104,23 +111,33 @@ std::istream& operator>>(std::istream& in, User& user)
 {
 	const int MAX_LINE_LEN = 128;
 	char line[MAX_LINE_LEN];
+	char readUsername[MAX_LINE_LEN]; //Initializing buffer for reading
+	char readPassword[MAX_LINE_LEN];
+	bool readIsAdmin;
+	user.isFound = 0;
+
 	do //Skips empty lines in file
 	{
-		in.getline(line, MAX_LINE_LEN); 
+		in.getline(readUsername, MAX_LINE_LEN); 
+		in.getline(readPassword, MAX_LINE_LEN);
+		in >> readIsAdmin;
+		in.getline(line, MAX_LINE_LEN);
+		user.isAdmin = readIsAdmin;
+		if ((strcmp(readUsername, user.username) == 0) && (strcmp(readPassword, user.password) == 0))
+		{
+			user.isFound = 1;
+			break;
+		}
 		if (in.eof())
 		{
-			return in;
+			break;
 		}
 	} while (strlen(line) == 0);
-	user.setUsername(line);
 
-	in.getline(line, MAX_LINE_LEN); 
-	user.setPassword(line);
-
-	bool isAdmin;
-	in >> isAdmin;
-	user.setIsAdmin(isAdmin);
-	in.getline(line, MAX_LINE_LEN); 
+	if (user.isFound == 0)
+	{
+		std::cout << "Wrong username or password!" << std::endl;
+	}
 
 	return in;
 }

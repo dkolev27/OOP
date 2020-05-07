@@ -1,9 +1,13 @@
 #pragma once
+#include <string>
+
+using namespace std;
+
 class User
 {
 public:
 	User();
-	User(const char* username, const char* password, bool isAdmin);
+	User(const string& username, const string& password, bool isAdmin);
 	User(const User& other);
 	User& operator=(const User& other);
 	~User();
@@ -11,22 +15,19 @@ public:
 	friend std::istream& operator>>(std::istream& in, User& user);
 	friend std::ostream& operator<<(std::ostream& out, User& user);
 
-	void setUsername(const char* username);
-	char* getUsername() const;
-	void setPassword(const char* password);
-	char* getPassword() const;
+	void setUsername(const string& username);
+	string getUsername() const;
+	void setPassword(const string& password);
+	string getPassword() const;
 	void setIsAdmin(bool isAdmin);
 	bool getIsAdmin() const;
-	bool getIsFound() const;
 
 	void print() const;
 
 private:
-	char* username;
-	char* password;
+	string username;
+	string password;
 	bool isAdmin;
-
-	bool isFound;
 
 	//Helpers
 	void copy(const User& other);
