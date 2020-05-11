@@ -2,9 +2,7 @@
 #include "BookArray.h"
 
 BookArray::BookArray()
-{
-	init();
-}
+{}
 
 BookArray::BookArray(const BookArray& other)
 {
@@ -26,40 +24,25 @@ BookArray::~BookArray()
 	clear();
 }
 
-void BookArray::addBook(const BooksData& book)
+void BookArray::addBook(const Book& book)
 {
-	if (currentCount == currentSize)
-	{
-		currentSize *= 2;
-		BooksData** newArr;
-		newArr = new BooksData * [currentSize];
-		for (int i = 0; i < currentCount; i++)
-		{
-			newArr[i] = arr[i];
-		}
-		delete[] arr;
-		arr = newArr;
-	}
-
-	arr[currentCount] = new BooksData(book);
-	currentCount++;
+	books.push_back(new Book(book));
 }
 
-void BookArray::openFile(const char* filepath)
+void BookArray::openFile(const string& filepath)
 {
 	std::ifstream file(filepath);
 	if (file)
 	{
 		clear();
-		init();
 		setFilepath(filepath); 
 		while (!file.eof())
 		{
-			BooksData book;
+			Book book;
 			file >> book; 
-			if (book.getAuthor() == nullptr) 
+			if (book.getAuthor().size() == 0) 
 			{
-				if (currentCount == 0)
+				if (books.size() == 0)
 				{
 					std::cout << "The file is empty!" << std::endl;
 				}
@@ -76,14 +59,14 @@ void BookArray::openFile(const char* filepath)
 	}
 }
 
-void BookArray::saveFile(const char* filepath)
+void BookArray::saveFile(const string& filepath)
 {
 	std::ofstream file(filepath);
 	if (file)
 	{
-		for (int i = 0; i < currentCount; i++)
+		for (size_t i = 0; i < books.size(); i++)
 		{
-			file << *arr[i];
+			file << *books[i];
 		}
 
 		file.close();
@@ -102,9 +85,9 @@ void BookArray::saveFile() // «а да мога да напиша save без да пиша името на фай
 
 void BookArray::printAll() const
 {
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < books.size(); i++)
 	{
-		arr[i]->print();
+		books[i]->print();
 	}
 }
 
@@ -113,54 +96,31 @@ void BookArray::close()
 	clear();
 }
 
-char* BookArray::getFilepath()
+string BookArray::getFilepath() const
 {
 	return filepath;
 }
 
-void BookArray::setFilepath(const char* filepath)
+void BookArray::setFilepath(const string& filepath)
 {
-	if (this->filepath)
-	{
-		delete[] this->filepath;
-	}
-	this->filepath = new char[strlen(filepath) + 1];
-	strcpy(this->filepath, filepath);
+	this->filepath = filepath;
 }
 
 void BookArray::copy(const BookArray& other)
 {
-	currentSize = other.currentSize;
-	currentCount = other.currentCount;
-	arr = new BooksData* [currentSize];
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < books.size(); i++)
 	{
-		arr[i] = new BooksData(*other.arr[i]); 
+		books.push_back(new Book(*other.books[i])) ;
 	}
-	if (other.filepath)
-	{
-		setFilepath(other.filepath);
-	}
+	this->filepath = other.filepath;
 }
 
 void BookArray::clear()
 {
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < books.size(); i++)
 	{
-		delete arr[i];
+		delete books[i];
 	}
-	currentCount = 0;
-	currentSize = 0;
-	delete[] arr;
-	arr = nullptr;
-	delete[] filepath;
-	filepath = nullptr;
-}
-
-void BookArray::init()
-{
-	currentSize = 2;
-	currentCount = 0;
-	arr = new BooksData * [currentSize];
-	filepath = nullptr;
+	books.clear();
+	filepath = "";
 }

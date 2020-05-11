@@ -1,5 +1,10 @@
 #pragma once
 #include "User.h"
+#include <string>
+#include <vector>
+
+using namespace std;
+
 class UserArray
 {
 public:
@@ -9,17 +14,14 @@ public:
 	~UserArray();
 
 	void addUser(const User& user);
-	void openFile(const char* filepath);
-	void saveFile(const char* filepath);
+	void openFile(const string& filepath);
+	void saveFile(const string& filepath);
 
 	void print() const;
 
 private:
-	User** arr;
-	int currentSize;
-	int currentCount;
+	std::vector<User*> users;
 
 	void copy(const UserArray& other);
 	void clear();
-	void init();
 };

@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include "UserArray.h"
+
 UserArray::UserArray()
-{
-	init();
-}
+{}
 
 UserArray::UserArray(const UserArray& other)
 {
@@ -28,35 +27,20 @@ UserArray::~UserArray()
 
 void UserArray::addUser(const User& user)
 {
-	if (currentCount == currentSize)
-	{
-		currentSize *= 2;
-		User** newArr;
-		newArr = new User*[currentSize];
-		for (int i = 0; i < currentCount; i++)
-		{	
-			newArr[i] = arr[i];
-		}
-		delete[] arr;
-		arr = newArr;
-	}
-
-	arr[currentCount] = new User(user);
-	currentCount++;
+	users.push_back(new User(user));
 }
 
-void UserArray::openFile(const char* filepath)
+void UserArray::openFile(const string& filepath)
 {
 	std::ifstream file(filepath);
 	if (file)
 	{
 		clear();
-		init();
 		while (!file.eof())
 		{
 			User user;
 			file >> user;
-			if (user.getUsername() == nullptr) 
+			if (user.getUsername().size() == 0) 
 			{
 				break;
 			}
@@ -67,14 +51,14 @@ void UserArray::openFile(const char* filepath)
 	}
 }
 
-void UserArray::saveFile(const char* filepath)
+void UserArray::saveFile(const string& filepath)
 {
 	std::ofstream file(filepath);
 	if (file)
 	{
-		for (int i = 0; i < currentCount; i++)
+		for (size_t i = 0; i < users.size(); i++)
 		{
-			file << *arr[i];
+			file << *users[i];
 		}
 
 		file.close();
@@ -83,36 +67,25 @@ void UserArray::saveFile(const char* filepath)
 
 void UserArray::print() const
 {
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < users.size(); i++)
 	{
-		std::cout << *arr[i];
+		std::cout << *users[i];
 	}
 }
 
 void UserArray::copy(const UserArray& other)
 {
-	currentSize = other.currentSize;
-	currentCount = other.currentCount;
-	arr = new User*[currentSize];
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < users.size(); i++)
 	{
-		arr[i] = new User(*other.arr[i]);
+		users.push_back(new User(*other.users[i]));
 	}
 }
 
 void UserArray::clear()
 {
-	for (int i = 0; i < currentCount; i++)
+	for (size_t i = 0; i < users.size(); i++)
 	{
-		delete arr[i];
+		delete users[i];
 	}
-	delete[] arr;
-	arr = nullptr;
-}
-
-void UserArray::init()
-{
-	currentSize = 2;
-	currentCount = 0;
-	arr = new User*[currentSize];
+	users.clear();
 }

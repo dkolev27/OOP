@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
-#include "BooksData.h"
+#include "Book.h"
 #include "UserArray.h"
 #include "BookArray.h"
-#include "Commands.h"
+#include "Manager.h"
 
 int main()
 {
-	commands();
+	Manager manager;
+	manager.commands();
 
 	return 0;
 }
