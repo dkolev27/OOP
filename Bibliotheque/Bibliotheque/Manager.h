@@ -8,6 +8,6 @@ struct Manager
 {
 	void commands();
 
-	vector <string> splitLine(const string& line);
+	vector <string> splitLine(string line);
 };
 

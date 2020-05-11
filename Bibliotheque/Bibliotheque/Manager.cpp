@@ -19,66 +19,157 @@ void Manager::commands()
 	{
 		std::cout << "> ";
 		getline(cin, line);
-		size_t pos = line.find(" ");
-		cout << pos << endl;
-		/*
-		command = strtok(line, " "); //Функцията е взета от интернет
-		if (!command)
+		vector<string> parts = splitLine(line);
+		
+		if (parts.size() == 0)
 		{
 			continue;
 		}
-		else if (strcmp(command, "open") == 0)
+		else if (parts[0] == "open")
 		{
-			char* filepath = strtok(NULL, " ");
-			if (filepath)
+			if (parts.size() >= 2)
 			{
-				books.openFile(filepath);
+				books.openFile(parts[1]);
 			}
 			else
 			{
 				cout << "Please input a filename!" << std::endl;
 			}
 		}
-		else if (strcmp(command, "close") == 0)
+		else if (parts[0] == "close")
 		{
 			books.close();
 		}
-		else if (strcmp(command, "save") == 0)
+		else if (parts[0] == "save")
 		{
-			if (books.getFilepath())
+			if (books.getFilepath().size())
 			{
 				books.saveFile(); 
 			}
 			else
 			{
 				std::cout << "Filename: ";
-				std::cin.getline(line, MAX_CMD_LINE_LEN);
+				getline(cin,line);
 				books.saveFile(line);
 			}
 		}
-		else if (strcmp(command, "saveAs") == 0)
+		else if (parts[0] == "saveAs")
 		{
-			char* filepath = strtok(NULL, " ");
-			if (filepath)
+			if (parts.size() >= 2)
 			{
-				books.saveFile(filepath);
+				books.saveFile(parts[1]);
 			}
 			else
 			{
 				std::cout << "Please input a filename!" << std::endl;
 			}
 		}
-		else if (strcmp(command, "booksAdd") == 0)
+		else if (parts[0] == "booksAdd")
 		{
 			Book book;
 			book.input();
 			books.addBook(book);
 		}
-		else if (strcmp(command, "booksAll") == 0)
+		else if (parts[0] == "booksAll")
 		{
 			books.printAll();
 		}
-		else if (strcmp(command, "help") == 0)
+		else if (parts[0] == "booksView")
+		{
+				books.printView();
+		}
+		else if (parts[0] == "booksInfo")
+		{
+			if (parts.size() >= 2)
+			{
+				int isbn = atoi(parts[1].c_str());
+				Book* book = books.getByISBN(isbn);
+				if (book)
+				{
+					cout << *book;
+				}
+				else
+				{
+					cout << "Book not found!" << endl;
+				}
+			}
+			else
+			{
+				std::cout << "Please input a ISBN!" << std::endl;
+			}
+		}
+		else if (parts[0] == "booksRemove")
+		{
+			if (parts.size() >= 2)
+			{
+				int isbn = atoi(parts[1].c_str());
+				bool isRemoved = books.removeByISBN(isbn);
+				if (isRemoved)
+				{
+					cout << "Book removed!" << endl;
+				}
+				else
+				{
+					cout << "Book not found!" << endl;
+				}
+			}
+			else
+			{
+				std::cout << "Please input a ISBN!" << std::endl;
+			}
+		}
+		else if (parts[0] == "booksSort")
+		{
+			if (parts.size() >= 2)
+			{
+				bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
+				if (parts[1] == "title")
+				{
+
+				}
+				else if (parts[1] == "author")
+				{
+
+				}
+				else if (parts[1] == "year")
+				{
+					cmpFunction = yearCmp;
+				}
+				else if (parts[1] == "rating")
+				{
+
+				}
+
+				if (parts.size() >= 3)
+				{
+					if (parts[2] == "asc")
+					{
+
+					}
+					else if (parts[2] == "desc")
+					{
+
+					}
+					else
+					{
+						cout << "Not a valid sorting order!" << endl;
+					}
+				}
+				if (cmpFunction)
+				{
+					books.booksSort(cmpFunction);
+				}
+				else
+				{
+					cout << "Not a valid sorting method!" << endl;
+				}
+			}
+			else
+			{
+				cout << "Please choose sorting method!" << endl;
+			}
+		}
+		else if (parts[0] == "help")
 		{
 			std::cout << "open FILEPATH - opens a book file" << std::endl;
 			std::cout << "close - closes the current book file" << std::endl; 
@@ -89,14 +180,41 @@ void Manager::commands()
 			std::cout << "help - displays all commands and their capabilities" << std::endl; 
 			std::cout << "exit - closes the program" << std::endl; 
 		}
-		else if (strcmp(command, "exit") == 0)
+		else if (parts[0] == "exit")
 		{
 			break;
 		}
 		else
 		{
 			std::cout << "Invalid command!" << std::endl;
-		}*/
+		}
 	} 
 	while (true);
+}
+
+vector<string> Manager::splitLine(string line)
+{
+	vector<string> vec;
+	while (line.size())
+	{
+		size_t pos = line.find(' ');
+		while (pos == 0)
+		{
+			line = line.substr(1); //Отзярва разтоянието преди текста
+			pos = line.find(' ');
+		}
+		if (pos == -1)
+		{
+			vec.push_back(line);
+			line.clear();
+		}
+		else
+		{
+			string part = line.substr(0, pos); // Взима line от началото до празното разтояние
+			"red blue";
+			vec.push_back(part);
+			line = line.substr(pos + 1); //Взимаме от празното разтояние до края
+		}
+	}
+	return vec;
 }

@@ -85,9 +85,76 @@ void BookArray::saveFile() // «а да мога да напиша save без да пиша името на фай
 
 void BookArray::printAll() const
 {
+	if (books.size())
+	{
+		for (size_t i = 0; i < books.size(); i++)
+		{
+			books[i]->print();
+		}
+	}
+	else
+	{
+		cout << "No books to be shown!" << endl;
+	}
+}
+
+void BookArray::printView() const
+{
+	if (books.size())
+	{
+		for (size_t i = 0; i < books.size(); i++)
+		{
+			cout << *books[i] << endl;
+		}
+	}
+	else
+	{
+		cout << "No books to be shown!" << endl;
+	}
+}
+
+Book* BookArray::getByISBN(int isbn) const
+{
 	for (size_t i = 0; i < books.size(); i++)
 	{
-		books[i]->print();
+		if (isbn == books[i]->getBibliothequeUniqueNumberr())
+		{
+			return books[i];
+		}
+	}
+	return nullptr;
+}
+
+bool BookArray::removeByISBN(int isbn)
+{
+	for (size_t i = 0; i < books.size(); i++)
+	{
+		if (isbn == books[i]->getBibliothequeUniqueNumberr())
+		{
+			delete books[i];
+			books.erase(books.begin() + i);
+			return true;
+		}
+	}
+	return false;
+}
+
+void BookArray::booksSort(bool (*cmpFunction)(const Book* a, const Book* b))
+{
+	//Bubble sort
+	for (size_t i = 0; i < books.size(); i++)
+	{
+		for (size_t j = 0; j < books.size() - 1; j++)
+		{
+			Book* a = books[j];
+			Book* b = books[j + 1];
+			if (cmpFunction(a, b))
+			{
+				Book* book = books[j];
+				books[j] = books[j + 1];
+				books[j + 1] = book;
+			}
+		}
 	}
 }
 
@@ -123,4 +190,9 @@ void BookArray::clear()
 	}
 	books.clear();
 	filepath = "";
+}
+
+bool yearCmp(const Book* a, const Book* b) 
+{
+	return a->getYear() < b->getYear();
 }

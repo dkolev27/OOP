@@ -18,6 +18,11 @@ public:
 	void saveFile(const string& filepath); //Запазва на ново място
 	void saveFile(); //Запазва на същото място
 	void printAll() const;
+	void printView() const;
+	Book* getByISBN(int isbn) const;
+	bool removeByISBN(int isbn);
+	void booksSort(bool (*cmpFunction)(const Book* a, const Book* b));
+	
 
 	void close();
 
@@ -35,3 +40,4 @@ private:
 	void clear();
 };
 
+bool yearCmp(const Book* a, const Book* b) ;
