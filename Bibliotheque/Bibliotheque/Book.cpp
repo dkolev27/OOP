@@ -252,3 +252,23 @@ std::ostream& operator<<(std::ostream& out, Book& book)
 		<< book.bibliotheque_unique_number << std::endl;
 	return out;
 }
+
+bool booksYearCmp(const Book* a, const Book* b)
+{
+	return a->getYear() > b->getYear();
+}
+
+bool booksAuthorCmp(const Book* a, const Book* b)
+{
+	return a->getAuthor() > b->getAuthor();
+}
+
+bool booksTitleCmp(const Book* a, const Book* b)
+{
+	return a->getTitle() > b->getTitle();
+}
+
+bool booksRatingCmp(const Book* a, const Book* b)
+{
+	return a->getRating() > b->getRating();
+}

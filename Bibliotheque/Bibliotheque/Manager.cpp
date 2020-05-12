@@ -98,6 +98,52 @@ void Manager::commands()
 				std::cout << "Please input a ISBN!" << std::endl;
 			}
 		}
+		else if (parts[0] == "booksFind")
+		{
+			if (parts.size() >= 3)
+			{
+				Book* book;
+				string arg = parts[2];
+				for (size_t i = 3; i < parts.size(); i++)
+				{
+					arg += " " + parts[i];
+				}
+				bool error = false;
+				if (parts[1] == "title")
+				{
+					book = books.getByTitle(arg);
+				}
+				else if (parts[1] == "author")
+				{
+					book = books.getByAuthor(arg);
+				}
+				else if (parts[1] == "tag")
+				{
+					book = books.getByTag(arg);
+				}
+				else
+				{
+					error = true;
+					cout << "Invalid search criteria!" << endl;
+				}
+
+				if (!error)
+				{
+					if (book)
+					{
+						book->print();
+					}
+					else
+					{
+						cout << "Book not found!" << endl;
+					}
+				}
+			}
+			else
+			{
+				cout << "Not enough agruments!" << endl;
+			}
+		}
 		else if (parts[0] == "booksRemove")
 		{
 			if (parts.size() >= 2)
@@ -125,39 +171,41 @@ void Manager::commands()
 				bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
 				if (parts[1] == "title")
 				{
-
+					cmpFunction = booksTitleCmp;
 				}
 				else if (parts[1] == "author")
 				{
-
+					cmpFunction = booksAuthorCmp;
 				}
 				else if (parts[1] == "year")
 				{
-					cmpFunction = yearCmp;
+					cmpFunction = booksYearCmp;
 				}
 				else if (parts[1] == "rating")
 				{
-
+					cmpFunction = booksRatingCmp;
 				}
 
+				bool desc = false;
 				if (parts.size() >= 3)
 				{
 					if (parts[2] == "asc")
 					{
-
+						desc = false;
 					}
 					else if (parts[2] == "desc")
 					{
-
+						desc = true;
 					}
-					else
+					else 
 					{
-						cout << "Not a valid sorting order!" << endl;
+						cmpFunction = nullptr; // за да не се пуска booksSort
 					}
 				}
 				if (cmpFunction)
 				{
-					books.booksSort(cmpFunction);
+					books.booksSort(cmpFunction, desc);
+					cout << "Books sorted!" << endl;
 				}
 				else
 				{
@@ -171,12 +219,17 @@ void Manager::commands()
 		}
 		else if (parts[0] == "help")
 		{
-			std::cout << "open FILEPATH - opens a book file" << std::endl;
+			std::cout << "open <FILEPATH> - opens a book file" << std::endl;
 			std::cout << "close - closes the current book file" << std::endl; 
 			std::cout << "save - saves the current book file" << std::endl; 
-			std::cout << "saveAs FILEPATH - saves the current book file in a new location" << std::endl; 
+			std::cout << "saveAs <FILEPATH> - saves the current book file in a new location" << std::endl; 
 			std::cout << "booksAdd - adds a new book" << std::endl; 
+			std::cout << "booksRemove <ISBN> - removes a book" << std::endl; 
 			std::cout << "booksAll - displays all books" << std::endl; 
+			std::cout << "booksView - displays detailed information of all books" << std::endl; 
+			std::cout << "booksInfo <ISBN> - displays book" << std::endl; 
+			std::cout << "booksFind <title|author|tag> <SEARCH> - finds a book" << std::endl; 
+			std::cout << "booksSort <title|author|year|rating> [asc|desc] - sort books" << std::endl; 
 			std::cout << "help - displays all commands and their capabilities" << std::endl; 
 			std::cout << "exit - closes the program" << std::endl; 
 		}

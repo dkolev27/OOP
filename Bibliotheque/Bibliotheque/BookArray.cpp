@@ -125,6 +125,45 @@ Book* BookArray::getByISBN(int isbn) const
 	return nullptr;
 }
 
+Book* BookArray::getByTitle(const string& title) const
+{
+	for(size_t i = 0; i < books.size(); i++)
+	{
+		if (title == books[i]->getTitle())
+		{
+			return books[i];
+		}
+	}
+	return nullptr;
+}
+
+Book* BookArray::getByAuthor(const string& author) const
+{
+	for (size_t i = 0; i < books.size(); i++)
+	{
+		if (author == books[i]->getAuthor())
+		{
+			return books[i];
+		}
+	}
+	return nullptr;
+}
+
+Book* BookArray::getByTag(const string& tag) const
+{
+	for (size_t i = 0; i < books.size(); i++)
+	{
+		string keywords = books[i]->getKeywords();
+		size_t pos = keywords.find(tag);
+		// (намерено     (в начало || space преди намереното  ) && (стига до края                  || има запетая след намереното))   
+		if (pos != -1 && (pos == 0 || keywords[pos - 1] == ' ') && (pos + tag.size() == tag.size() || keywords[pos + tag.size()] == ','))
+		{
+			return books[i];
+		}
+	}
+	return nullptr;
+}
+
 bool BookArray::removeByISBN(int isbn)
 {
 	for (size_t i = 0; i < books.size(); i++)
@@ -139,7 +178,7 @@ bool BookArray::removeByISBN(int isbn)
 	return false;
 }
 
-void BookArray::booksSort(bool (*cmpFunction)(const Book* a, const Book* b))
+void BookArray::booksSort(bool (*cmpFunction)(const Book* a, const Book* b), bool desc)
 {
 	//Bubble sort
 	for (size_t i = 0; i < books.size(); i++)
@@ -148,7 +187,14 @@ void BookArray::booksSort(bool (*cmpFunction)(const Book* a, const Book* b))
 		{
 			Book* a = books[j];
 			Book* b = books[j + 1];
-			if (cmpFunction(a, b))
+			bool aIsGreater = cmpFunction(a, b); 
+			//false && !(15 > 10) || !false && (15 > 10) - ще се разменят
+			//true  && !(15 > 10) || !true  && (15 > 10) - няма да се разменят
+			//false && !(10 > 15) || !false && (10 > 15) - няма да се разменят
+			//true  && !(10 > 15) || !true  && (10 > 15) - ще се разменят
+			//false && !(10 > 10) || !false && (10 > 10) - няма да се разменят
+			//true  && !(10 > 10) || !true  && (10 > 10) - ще се разменят
+			if ((desc && !aIsGreater) || (!desc && aIsGreater)) 
 			{
 				Book* book = books[j];
 				books[j] = books[j + 1];
@@ -192,7 +238,3 @@ void BookArray::clear()
 	filepath = "";
 }
 
-bool yearCmp(const Book* a, const Book* b) 
-{
-	return a->getYear() < b->getYear();
-}

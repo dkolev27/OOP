@@ -53,3 +53,7 @@ private:
 	void copy(const Book& other);
 };
 
+bool booksYearCmp(const Book* a, const Book* b);
+bool booksAuthorCmp(const Book* a, const Book* b);
+bool booksTitleCmp(const Book* a, const Book* b);
+bool booksRatingCmp(const Book* a, const Book* b);

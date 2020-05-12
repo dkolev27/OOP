@@ -20,8 +20,11 @@ public:
 	void printAll() const;
 	void printView() const;
 	Book* getByISBN(int isbn) const;
+	Book* getByTitle(const string& title) const;
+	Book* getByAuthor(const string& author) const;
+	Book* getByTag(const string& tag) const;
 	bool removeByISBN(int isbn);
-	void booksSort(bool (*cmpFunction)(const Book* a, const Book* b));
+	void booksSort(bool (*cmpFunction)(const Book* a, const Book* b), bool desc = false);
 	
 
 	void close();
@@ -40,4 +43,3 @@ private:
 	void clear();
 };
 
-bool yearCmp(const Book* a, const Book* b) ;
