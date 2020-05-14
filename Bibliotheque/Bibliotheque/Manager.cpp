@@ -13,17 +13,126 @@ void Manager::commands()
 {
 	string line;
 	BookArray books; 
+	UserArray users("users.txt");
+	User* user = nullptr;
 	string command;
 
 	do
 	{
-		std::cout << "> ";
+		cout << "> ";
 		getline(cin, line);
 		vector<string> parts = splitLine(line);
 		
 		if (parts.size() == 0)
 		{
 			continue;
+		}
+		else if (parts[0] == "login")
+		{
+			string username;
+			string password;
+			cout << "Username: ";
+			getline(cin, username);
+			cout << "Password: ";
+			getline(cin, password);
+			User* newUser = users.logInUser(username, password);
+			if (newUser)
+			{
+				user = newUser;
+				cout << "Welcome " << user->getUsername() << "!" << endl;
+			}
+			else
+			{
+				cout << "Invalid username or password!" << endl;
+			}
+		}
+		else if (parts[0] == "logout")
+		{
+			if (user)
+			{
+				cout << "Goodbye " << user->getUsername() << "!" << endl;
+				user = nullptr;
+			}
+			else
+			{
+				cout << "You are not logged in!" << endl;
+			}
+		}
+		else if (parts[0] == "usersAdd")
+		{
+			if (parts.size() >= 3)
+			{
+				if (user)
+				{
+					if (user->getIsAdmin())
+					{
+						User* existingUser = users.getUser(parts[1]);
+						if (existingUser)
+						{
+							cout << "User already exists!" << endl;
+						}
+						else
+						{
+							User newUser(parts[1], parts[2], false);
+							users.addUser(newUser);
+							users.saveFile();
+						}
+					}
+					else
+					{
+						cout << "Only admin can add users!!!" << endl;
+					}
+				}
+				else
+				{
+					cout << "You have to be logged in!" << endl;
+				}
+			}
+			else
+			{
+				cout << "Please input username and password!" << endl;
+			}
+		}
+		else if (parts[0] == "usersRemove")
+		{
+			if (parts.size() >= 2)
+			{
+				if (user)
+				{
+					if (user->getIsAdmin())
+					{
+						if (parts[1] == user->getUsername())
+						{
+							cout << "Can't remove yourself!" << endl;
+						}
+						else
+						{
+							bool userRemoved = users.removeUser(parts[1]);
+							if (userRemoved)
+							{
+								users.saveFile();
+								cout << "User removed!" << endl;
+							}
+							else
+							{
+								cout << "User doesn't exist!" << endl;
+							}
+						}
+					}
+					else
+					{
+						cout << "Only admin can remove users!!!" << endl;
+					}
+				}
+				else
+				{
+					cout << "You have to be logged in!" << endl;
+				}
+			}
+			else
+			{
+				cout << "Please input username and password!" << endl;
+			}
 		}
 		else if (parts[0] == "open")
 		{
@@ -33,7 +142,7 @@ void Manager::commands()
 			}
 			else
 			{
-				cout << "Please input a filename!" << std::endl;
+				cout << "Please input a filename!" << endl;
 			}
 		}
 		else if (parts[0] == "close")
@@ -48,7 +157,7 @@ void Manager::commands()
 			}
 			else
 			{
-				std::cout << "Filename: ";
+				cout << "Filename: ";
 				getline(cin,line);
 				books.saveFile(line);
 			}
@@ -61,177 +170,230 @@ void Manager::commands()
 			}
 			else
 			{
-				std::cout << "Please input a filename!" << std::endl;
+				cout << "Please input a filename!" << endl;
 			}
 		}
 		else if (parts[0] == "booksAdd")
 		{
-			Book book;
-			book.input();
-			books.addBook(book);
-		}
-		else if (parts[0] == "booksAll")
-		{
-			books.printAll();
-		}
-		else if (parts[0] == "booksView")
-		{
-				books.printView();
-		}
-		else if (parts[0] == "booksInfo")
-		{
-			if (parts.size() >= 2)
+			if (user && user->getIsAdmin())
 			{
-				int isbn = atoi(parts[1].c_str());
-				Book* book = books.getByISBN(isbn);
-				if (book)
-				{
-					cout << *book;
-				}
-				else
-				{
-					cout << "Book not found!" << endl;
-				}
+				Book book;
+				book.input();
+				books.addBook(book);
 			}
 			else
 			{
-				std::cout << "Please input a ISBN!" << std::endl;
+				cout << "Only admin can add new books!" << endl;
 			}
 		}
-		else if (parts[0] == "booksFind")
+		else if (parts[0] == "booksAll")
 		{
-			if (parts.size() >= 3)
+			if (user)
 			{
-				Book* book;
-				string arg = parts[2];
-				for (size_t i = 3; i < parts.size(); i++)
+				books.printAll();
+			}
+			else
+			{
+				cout << "You have to be logged in to view books!" << endl;
+			}
+		}
+		else if (parts[0] == "booksView")
+		{
+			if (user)
+			{
+				books.printView();
+			}
+			else
+			{
+				cout << "You have to be logged in to view books!" << endl;
+			}
+		}
+		else if (parts[0] == "booksInfo")
+		{
+			if (user)
+			{
+				if (parts.size() >= 2)
 				{
-					arg += " " + parts[i];
-				}
-				bool error = false;
-				if (parts[1] == "title")
-				{
-					book = books.getByTitle(arg);
-				}
-				else if (parts[1] == "author")
-				{
-					book = books.getByAuthor(arg);
-				}
-				else if (parts[1] == "tag")
-				{
-					book = books.getByTag(arg);
-				}
-				else
-				{
-					error = true;
-					cout << "Invalid search criteria!" << endl;
-				}
-
-				if (!error)
-				{
+					int isbn = atoi(parts[1].c_str());
+					Book* book = books.getByISBN(isbn);
 					if (book)
 					{
-						book->print();
+						cout << *book;
 					}
 					else
 					{
 						cout << "Book not found!" << endl;
 					}
 				}
+				else
+				{
+					cout << "Please input a ISBN!" << endl;
+				}
 			}
 			else
 			{
-				cout << "Not enough agruments!" << endl;
+				cout << "You have to be logged in to view books!" << endl;
+			}
+		}
+		else if (parts[0] == "booksFind")
+		{
+			if (user)
+			{
+				if (parts.size() >= 3)
+				{
+					Book* book;
+					string arg = parts[2];
+					for (size_t i = 3; i < parts.size(); i++)
+					{
+						arg += " " + parts[i];
+					}
+					bool error = false;
+					if (parts[1] == "title")
+					{
+						book = books.getByTitle(arg);
+					}
+					else if (parts[1] == "author")
+					{
+						book = books.getByAuthor(arg);
+					}
+					else if (parts[1] == "tag")
+					{
+						book = books.getByTag(arg);
+					}
+					else
+					{
+						error = true;
+						cout << "Invalid search criteria!" << endl;
+					}
+
+					if (!error)
+					{
+						if (book)
+						{
+							book->print();
+						}
+						else
+						{
+							cout << "Book not found!" << endl;
+						}
+					}
+				}
+				else
+				{
+					cout << "Not enough agruments!" << endl;
+				}
+			}
+			else
+			{
+				cout << "You have to be logged in to find books!" << endl;
 			}
 		}
 		else if (parts[0] == "booksRemove")
 		{
-			if (parts.size() >= 2)
+			if (user && user->getIsAdmin())
 			{
-				int isbn = atoi(parts[1].c_str());
-				bool isRemoved = books.removeByISBN(isbn);
-				if (isRemoved)
+				if (parts.size() >= 2)
 				{
-					cout << "Book removed!" << endl;
+					int isbn = atoi(parts[1].c_str());
+					bool isRemoved = books.removeByISBN(isbn);
+					if (isRemoved)
+					{
+						cout << "Book removed!" << endl;
+					}
+					else
+					{
+						cout << "Book not found!" << endl;
+					}
 				}
 				else
 				{
-					cout << "Book not found!" << endl;
+					cout << "Please input a ISBN!" << endl;
 				}
 			}
 			else
 			{
-				std::cout << "Please input a ISBN!" << std::endl;
+				cout << "Only admin can remove books!" << endl;
 			}
 		}
 		else if (parts[0] == "booksSort")
 		{
-			if (parts.size() >= 2)
+			if (user)
 			{
-				bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
-				if (parts[1] == "title")
+				if (parts.size() >= 2)
 				{
-					cmpFunction = booksTitleCmp;
-				}
-				else if (parts[1] == "author")
-				{
-					cmpFunction = booksAuthorCmp;
-				}
-				else if (parts[1] == "year")
-				{
-					cmpFunction = booksYearCmp;
-				}
-				else if (parts[1] == "rating")
-				{
-					cmpFunction = booksRatingCmp;
-				}
+					bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
+					if (parts[1] == "title")
+					{
+						cmpFunction = booksTitleCmp;
+					}
+					else if (parts[1] == "author")
+					{
+						cmpFunction = booksAuthorCmp;
+					}
+					else if (parts[1] == "year")
+					{
+						cmpFunction = booksYearCmp;
+					}
+					else if (parts[1] == "rating")
+					{
+						cmpFunction = booksRatingCmp;
+					}
 
-				bool desc = false;
-				if (parts.size() >= 3)
-				{
-					if (parts[2] == "asc")
+					bool desc = false;
+					if (parts.size() >= 3)
 					{
-						desc = false;
+						if (parts[2] == "asc")
+						{
+							desc = false;
+						}
+						else if (parts[2] == "desc")
+						{
+							desc = true;
+						}
+						else
+						{
+							cmpFunction = nullptr; // за да не се пуска booksSort
+						}
 					}
-					else if (parts[2] == "desc")
+					if (cmpFunction)
 					{
-						desc = true;
+						books.booksSort(cmpFunction, desc);
+						cout << "Books sorted!" << endl;
 					}
-					else 
+					else
 					{
-						cmpFunction = nullptr; // за да не се пуска booksSort
+						cout << "Not a valid sorting method!" << endl;
 					}
-				}
-				if (cmpFunction)
-				{
-					books.booksSort(cmpFunction, desc);
-					cout << "Books sorted!" << endl;
 				}
 				else
 				{
-					cout << "Not a valid sorting method!" << endl;
+					cout << "Please choose sorting method!" << endl;
 				}
 			}
 			else
 			{
-				cout << "Please choose sorting method!" << endl;
+				cout << "You have to be logged in to sort books!" << endl;
 			}
 		}
 		else if (parts[0] == "help")
 		{
-			std::cout << "open <FILEPATH> - opens a book file" << std::endl;
-			std::cout << "close - closes the current book file" << std::endl; 
-			std::cout << "save - saves the current book file" << std::endl; 
-			std::cout << "saveAs <FILEPATH> - saves the current book file in a new location" << std::endl; 
-			std::cout << "booksAdd - adds a new book" << std::endl; 
-			std::cout << "booksRemove <ISBN> - removes a book" << std::endl; 
-			std::cout << "booksAll - displays all books" << std::endl; 
-			std::cout << "booksView - displays detailed information of all books" << std::endl; 
-			std::cout << "booksInfo <ISBN> - displays book" << std::endl; 
-			std::cout << "booksFind <title|author|tag> <SEARCH> - finds a book" << std::endl; 
-			std::cout << "booksSort <title|author|year|rating> [asc|desc] - sort books" << std::endl; 
-			std::cout << "help - displays all commands and their capabilities" << std::endl; 
-			std::cout << "exit - closes the program" << std::endl; 
+			cout << "login - logs in an user" << endl;
+			cout << "logout - logs out an user" << endl;
+			cout << "open <FILEPATH> - opens a book file" << endl;
+			cout << "close - closes the current book file" << endl; 
+			cout << "save - saves the current book file" << endl; 
+			cout << "saveAs <FILEPATH> - saves the current book file in a new location" << endl; 
+			cout << "booksAdd - adds a new book" << endl; 
+			cout << "booksRemove <ISBN> - removes a book" << endl; 
+			cout << "booksAll - displays all books" << endl; 
+			cout << "booksView - displays detailed information of all books" << endl; 
+			cout << "booksInfo <ISBN> - displays book" << endl; 
+			cout << "booksFind <title|author|tag> <SEARCH> - finds a book" << endl; 
+			cout << "booksSort <title|author|year|rating> [asc|desc] - sort books" << endl; 
+			cout << "usersAdd <USERNAME> <PASSWORD> - adds a new user" << endl; 
+			cout << "usersRemove <USERNAME> - removes a user" << endl; 
+			cout << "help - displays all commands and their capabilities" << endl; 
+			cout << "exit - closes the program" << endl; 
 		}
 		else if (parts[0] == "exit")
 		{
@@ -239,7 +401,7 @@ void Manager::commands()
 		}
 		else
 		{
-			std::cout << "Invalid command!" << std::endl;
+			cout << "Invalid command!" << endl;
 		}
 	} 
 	while (true);

@@ -2,8 +2,16 @@
 #include <fstream>
 #include "UserArray.h"
 
-UserArray::UserArray()
-{}
+UserArray::UserArray(const string& filepath)
+{
+	this->filepath = filepath;
+	openFile(filepath);
+	if (users.size() == 0)
+	{
+		User admin("admin", "i<3c++", true);
+		addUser(admin);
+	}
+}
 
 UserArray::UserArray(const UserArray& other)
 {
@@ -36,6 +44,7 @@ void UserArray::openFile(const string& filepath)
 	if (file)
 	{
 		clear();
+		this->filepath = filepath;
 		while (!file.eof())
 		{
 			User user;
@@ -51,7 +60,45 @@ void UserArray::openFile(const string& filepath)
 	}
 }
 
-void UserArray::saveFile(const string& filepath)
+User* UserArray::logInUser(const string& username, const string& password) const
+{
+	for (size_t i = 0; i < users.size(); i++)
+	{
+		if ((users[i]->getUsername() == username) && (users[i]->getPassword() == password))
+		{
+			return users[i];
+		}
+	}
+	return nullptr;
+}
+
+User* UserArray::getUser(const string& username) const
+{
+	for (size_t i = 0; i < users.size(); i++)
+	{
+		if ((users[i]->getUsername() == username))
+		{
+			return users[i];
+		}
+	}
+	return nullptr;
+}
+
+bool UserArray::removeUser(const string& username)
+{
+	for (size_t i = 0; i < users.size(); i++)
+	{
+		if ((users[i]->getUsername() == username))
+		{
+			delete users[i];
+			users.erase(users.begin() + i);
+			return true;
+		}
+	}
+	return false;
+}
+
+void UserArray::saveFile() const
 {
 	std::ofstream file(filepath);
 	if (file)
