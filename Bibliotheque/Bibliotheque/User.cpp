@@ -2,6 +2,8 @@
 #include<cstring>
 #include "User.h"
 
+using namespace std;
+
 User::User()
 {
 	isAdmin = false;
@@ -66,7 +68,7 @@ bool User::getIsAdmin() const
 
 void User::print() const
 {
-	std::cout << username << " " << password << " " << isAdmin << std::endl;
+	cout << username << " " << password << " " << isAdmin << endl;
 }
 
 void User::copy(const User& other)
@@ -82,32 +84,31 @@ void User::clear()
 	password.clear();
 }
 
-std::istream& operator>>(std::istream& in, User& user)
+istream& operator>>(istream& in, User& user)
 {
-	const int MAX_LINE_LEN = 128;
-	char line[MAX_LINE_LEN];
-	do //Skips empty lines in file
+	string line;
+	do // Прескача празните редове във файла
 	{
-		in.getline(line, MAX_LINE_LEN); 
+		getline(in, line); // Чете потребителското име от файла
 		if (in.eof())
 		{
 			return in;
 		}
-	} while (strlen(line) == 0);
+	} while (line.size() == 0);
 	user.setUsername(line);
 
-	in.getline(line, MAX_LINE_LEN); 
+	getline(in, line); // Чете паролата от файла
 	user.setPassword(line);
 
 	bool isAdmin;
 	in >> isAdmin;
 	user.setIsAdmin(isAdmin);
-	in.getline(line, MAX_LINE_LEN); 
+	getline(in, line); // Чете дали потребителят е администратор от файла
 
 	return in;
 }
 
-std::ostream& operator<<(std::ostream& out, User& user)
+ostream& operator<<(ostream& out, User& user)
 {
 	out
 		<< user.username << std::endl

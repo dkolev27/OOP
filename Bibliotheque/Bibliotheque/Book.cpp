@@ -39,57 +39,56 @@ Book::~Book()
 
 void Book::input()
 {
-	const int MAX_LINE_LEN = 128;
-	char line[MAX_LINE_LEN];
+	string line;
 
-	std::cout << "Enter the author of the book: ";
-	std::cin.getline(line, MAX_LINE_LEN);
+	cout << "Enter the author of the book: ";
+	getline(cin, line);
 	setAuthor(line);
 
-	std::cout << "Enter the title of the book: ";
-	std::cin.getline(line, MAX_LINE_LEN);
+	cout << "Enter the title of the book: ";
+	getline(cin, line);
 	setTitle(line);
 
-	std::cout << "Enter the genre of the book: ";
-	std::cin.getline(line, MAX_LINE_LEN);
+	cout << "Enter the genre of the book: ";
+	getline(cin, line);
 	setGenre(line);
 
-	std::cout << "Enter a short discription about the book: ";
-	std::cin.getline(line, MAX_LINE_LEN);
+	cout << "Enter a short discription about the book: ";
+	getline(cin, line);
 	setShortDiscription(line);
 
 	int year;
-	std::cout << "When was the book published? ";
-	std::cin >> year;
+	cout << "When was the book published? ";
+	cin >> year;
 	setYear(year);
-	std::cin.getline(line, MAX_LINE_LEN);
+	getline(cin, line);
 
-	std::cout << "Enter some keywords related to the book: ";
-	std::cin.getline(line, MAX_LINE_LEN);
+	cout << "Enter some keywords related to the book: ";
+	getline(cin, line);
 	setKeywords(line);
 	
 	float rating;
-	std::cout << "Enter the rating of the book: ";
-	std::cin >> rating;
+	cout << "Enter the rating of the book: ";
+	cin >> rating;
 	setRating(rating);
-	std::cin.getline(line, MAX_LINE_LEN);
+	getline(cin, line);
 
 	int bibliotheque_unique_number;
-	std::cout << "Enter the unique bibliotheque number: ";
-	std::cin >> bibliotheque_unique_number;
+	cout << "Enter the unique bibliotheque number: ";
+	cin >> bibliotheque_unique_number;
 	setBibliothequeUniqueNumber(bibliotheque_unique_number);
-	std::cin.getline(line, MAX_LINE_LEN);
+	getline(cin, line);
 }
 
 void Book::print()
 {
 	if (author.size())
 	{
-		std::cout << title << " - " << author << " - " << genre << " - " << bibliotheque_unique_number << std::endl;
+		cout << title << " - " << author << " - " << genre << " - " << bibliotheque_unique_number << endl;
 	}
 	else
 	{
-		std::cout << "NO BOOK!" << std::endl;
+		cout << "NO BOOK!" << endl;
 	}
 }
 
@@ -168,7 +167,7 @@ void Book::setBibliothequeUniqueNumber(int bibliotheque_unique_number)
 	this->bibliotheque_unique_number = bibliotheque_unique_number;
 }
 
-int Book::getBibliothequeUniqueNumberr() const
+int Book::getBibliothequeUniqueNumber() const
 {
 	return bibliotheque_unique_number;
 }
@@ -194,62 +193,62 @@ void Book::copy(const Book& other)
 	this->bibliotheque_unique_number = other.bibliotheque_unique_number;
 }
 
-std::istream& operator>>(std::istream& in, Book& book)
+istream& operator>>(istream& in, Book& book)
 {
-	const int MAX_LINE_LEN = 128;
-	char line[MAX_LINE_LEN];
+	string line;
 
-	do //Skips empty lines in file
+	do // Прескача празните редове във файла
 	{
-		in.getline(line, MAX_LINE_LEN); //Read the author from file 
+		getline(in, line); // Чете автора от файла
 		if (in.eof())
 		{
 			return in;
 		}
-	} while (strlen(line) == 0);
+	} while (line.size() == 0);
 	book.setAuthor(line);
 
-	in.getline(line, MAX_LINE_LEN); //Read the title from file 
+	getline(in, line); // Чете заглавието от файла
 	book.setTitle(line);
 
-	in.getline(line, MAX_LINE_LEN); //Read the genre from file 
+	getline(in, line); // Чете жанра от файла
 	book.setGenre(line);
 
-	in.getline(line, MAX_LINE_LEN); //Read the short discription from file 
+	getline(in, line); // Чете краткото описание от файла
 	book.setShortDiscription(line);
 
 	int year;
 	in >> year;
 	book.setYear(year);
-	in.getline(line, MAX_LINE_LEN); //Skips \0 after the year
+	getline(in, line); // Прескача \0 след годината
 
-	in.getline(line, MAX_LINE_LEN); //Read the keywords from file 
+	getline(in, line); // Чете ключовите думи от файла
 	book.setKeywords(line);
 
 	float rating;
 	in >> rating;
 	book.setRating(rating);
-	in.getline(line, MAX_LINE_LEN); //Skips \0 after the rating
+	getline(in, line); // Прескача \0 след рейтинга
 
 	int bibliotheque_unique_number;
 	in >> bibliotheque_unique_number;
 	book.setBibliothequeUniqueNumber(bibliotheque_unique_number);
-	in.getline(line, MAX_LINE_LEN); //Skips \0 after the bibliotheque_unique_number
+	getline(in, line); // Прескача \0 след уникалния номер на книгата
 
 	return in;
 }
 
-std::ostream& operator<<(std::ostream& out, Book& book)
+ostream& operator<<(ostream& out, Book& book)
 {
 	out
-		<< book.author << std::endl
-		<< book.title << std::endl
-		<< book.genre << std::endl
-		<< book.short_discription << std::endl
-		<< book.year << std::endl
-		<< book.keywords << std::endl
-		<< book.rating << std::endl
-		<< book.bibliotheque_unique_number << std::endl;
+		<< book.author << endl
+		<< book.title << endl
+		<< book.genre << endl
+		<< book.short_discription << endl
+		<< book.year << endl
+		<< book.keywords << endl
+		<< book.rating << endl
+		<< book.bibliotheque_unique_number << endl;
+	 
 	return out;
 }
 

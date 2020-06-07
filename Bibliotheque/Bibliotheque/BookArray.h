@@ -8,11 +8,13 @@ using namespace std;
 class BookArray
 {
 public:
+	// Голяма четворка
 	BookArray();
 	BookArray(const BookArray& other);
 	BookArray& operator=(const BookArray& other);
 	~BookArray();
 
+	// Методи
 	void addBook(const Book& book);
 	void openFile(const string& filepath);
 	void saveFile(const string& filepath); //Запазва на ново място
@@ -24,21 +26,20 @@ public:
 	Book* getByAuthor(const string& author) const;
 	Book* getByTag(const string& tag) const;
 	bool removeByISBN(int isbn);
-	void booksSort(bool (*cmpFunction)(const Book* a, const Book* b), bool desc = false);
-	
-
+	void booksSort(bool (*cmpFunction)(const Book* a, const Book* b), bool desc = false); // Тази функция не е измислена и писана от мен, както и цялата логика, свързана с нея
 	void close();
 
-	//Getter and Setter
+	// Селектори и мутатори
 	string getFilepath() const;
+	int getCount() const;
 	void setFilepath(const string& filepath);
 	 
 private:
-	std::vector<Book*> books;
-
+	// Член данни
+	vector<Book*> books;
 	string filepath; //да запазваме вътре името на файла, който сме отворили
 
-	//Helpers
+	// Помощни функции
 	void copy(const BookArray& other);
 	void clear();
 };

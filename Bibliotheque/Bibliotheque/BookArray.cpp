@@ -48,7 +48,10 @@ void BookArray::openFile(const string& filepath)
 				}
 				break;
 			}
-			addBook(book);
+			else
+			{
+				addBook(book);
+			}
 		}
 
 		file.close();
@@ -117,7 +120,7 @@ Book* BookArray::getByISBN(int isbn) const
 {
 	for (size_t i = 0; i < books.size(); i++)
 	{
-		if (isbn == books[i]->getBibliothequeUniqueNumberr())
+		if (isbn == books[i]->getBibliothequeUniqueNumber())
 		{
 			return books[i];
 		}
@@ -155,8 +158,9 @@ Book* BookArray::getByTag(const string& tag) const
 	{
 		string keywords = books[i]->getKeywords();
 		size_t pos = keywords.find(tag);
-		// (намерено     (в начало || space преди намереното  ) && (стига до края                  || има запетая след намереното))   
-		if (pos != -1 && (pos == 0 || keywords[pos - 1] == ' ') && (pos + tag.size() == tag.size() || keywords[pos + tag.size()] == ','))
+		//               ПРЕДИ САМАТА ДУМА                         СЛЕД САМАТА ДУМА                     
+		// (намерено     (в начало || space преди намереното  ) && (стига до края                       || има запетая след намереното))   
+		if (pos != -1 && (pos == 0 || keywords[pos - 1] == ' ') && (pos + tag.size() == keywords.size() || keywords[pos + tag.size()] == ','))
 		{
 			return books[i];
 		}
@@ -164,11 +168,16 @@ Book* BookArray::getByTag(const string& tag) const
 	return nullptr;
 }
 
+int BookArray::getCount() const
+{
+	return books.size();
+}
+
 bool BookArray::removeByISBN(int isbn)
 {
 	for (size_t i = 0; i < books.size(); i++)
 	{
-		if (isbn == books[i]->getBibliothequeUniqueNumberr())
+		if (isbn == books[i]->getBibliothequeUniqueNumber())
 		{
 			delete books[i];
 			books.erase(books.begin() + i);
@@ -187,14 +196,17 @@ void BookArray::booksSort(bool (*cmpFunction)(const Book* a, const Book* b), boo
 		{
 			Book* a = books[j];
 			Book* b = books[j + 1];
-			bool aIsGreater = cmpFunction(a, b); 
-			//false && !(15 > 10) || !false && (15 > 10) - ще се разменят
-			//true  && !(15 > 10) || !true  && (15 > 10) - няма да се разменят
-			//false && !(10 > 15) || !false && (10 > 15) - няма да се разменят
-			//true  && !(10 > 15) || !true  && (10 > 15) - ще се разменят
-			//false && !(10 > 10) || !false && (10 > 10) - няма да се разменят
-			//true  && !(10 > 10) || !true  && (10 > 10) - ще се разменят
-			if ((desc && !aIsGreater) || (!desc && aIsGreater)) 
+			bool cmp; 
+			if (desc)
+			{
+				cmp = cmpFunction(b, a); // b > a
+			}
+			else
+			{
+				cmp = cmpFunction(a, b); // a > b
+			}
+
+			if (cmp)
 			{
 				Book* book = books[j];
 				books[j] = books[j + 1];

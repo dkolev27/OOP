@@ -11,14 +11,13 @@ using namespace std;
 
 void Manager::commands()
 {
-	string line;
 	BookArray books; 
 	UserArray users("users.txt");
-	User* user = nullptr;
-	string command;
+	User* loggedUser = nullptr;
 
 	do
 	{
+		string line;
 		cout << "> ";
 		getline(cin, line);
 		vector<string> parts = splitLine(line);
@@ -27,44 +26,67 @@ void Manager::commands()
 		{
 			continue;
 		}
-		else if (parts[0] == "login")
+		else if (parts[0] == "login") 
 		{
-			string username;
-			string password;
-			cout << "Username: ";
-			getline(cin, username);
-			cout << "Password: ";
-			getline(cin, password);
-			User* newUser = users.logInUser(username, password);
-			if (newUser)
+			if (parts.size() > 1)
 			{
-				user = newUser;
-				cout << "Welcome " << user->getUsername() << "!" << endl;
+				cout << "Too many arguments!" << endl;
 			}
 			else
 			{
-				cout << "Invalid username or password!" << endl;
+				string username;
+				string password;
+				if (loggedUser) //Ако опитаме да се логнем повече от 1 път
+				{ 
+					cout << "You are already logged in!!!" << endl;
+					continue;
+				}
+				cout << "Username: ";
+				getline(cin, username);
+				cout << "Password: ";
+				getline(cin, password);
+				User* user = users.logInUser(username, password);
+				if (user)
+				{
+					loggedUser = user;
+					cout << "Welcome " << loggedUser->getUsername() << "!" << endl;
+				}
+				else
+				{
+					cout << "Invalid username or password!" << endl;
+				}
 			}
 		}
 		else if (parts[0] == "logout")
 		{
-			if (user)
+			if (parts.size() > 1)
 			{
-				cout << "Goodbye " << user->getUsername() << "!" << endl;
-				user = nullptr;
+				cout << "Too many arguments!" << endl;
 			}
 			else
 			{
-				cout << "You are not logged in!" << endl;
+				if (loggedUser)
+				{
+					cout << "Goodbye " << loggedUser->getUsername() << "!" << endl;
+					loggedUser = nullptr;
+				}
+				else
+				{
+					cout << "You are not logged in!" << endl;
+				}
 			}
 		}
 		else if (parts[0] == "usersAdd")
 		{
-			if (parts.size() >= 3)
+			if (parts.size() > 3)
 			{
-				if (user)
+				cout << "Too many arguments!" << endl;
+			}
+			else if (parts.size() == 3)
+			{
+				if (loggedUser)
 				{
-					if (user->getIsAdmin())
+					if (loggedUser->getIsAdmin())
 					{
 						User* existingUser = users.getUser(parts[1]);
 						if (existingUser)
@@ -95,13 +117,17 @@ void Manager::commands()
 		}
 		else if (parts[0] == "usersRemove")
 		{
-			if (parts.size() >= 2)
+			if (parts.size() > 2)
 			{
-				if (user)
+				cout << "Too many arguments!" << endl;
+			}
+			else if (parts.size() == 2)
+			{
+				if (loggedUser)
 				{
-					if (user->getIsAdmin())
+					if (loggedUser->getIsAdmin())
 					{
-						if (parts[1] == user->getUsername())
+						if (parts[1] == loggedUser->getUsername())
 						{
 							cout << "Can't remove yourself!" << endl;
 						}
@@ -136,7 +162,11 @@ void Manager::commands()
 		}
 		else if (parts[0] == "open")
 		{
-			if (parts.size() >= 2)
+			if (parts.size() > 2)
+			{
+				cout << "Too many arguments!" << endl;
+			}
+			else if (parts.size() == 2)
 			{
 				books.openFile(parts[1]);
 			}
@@ -147,24 +177,42 @@ void Manager::commands()
 		}
 		else if (parts[0] == "close")
 		{
-			books.close();
-		}
-		else if (parts[0] == "save")
-		{
-			if (books.getFilepath().size())
+			if (parts.size() > 1)
 			{
-				books.saveFile(); 
+				cout << "Invalid command!" << endl;
 			}
 			else
 			{
-				cout << "Filename: ";
-				getline(cin,line);
-				books.saveFile(line);
+				books.close();
+			}
+		}
+		else if (parts[0] == "save")
+		{
+			if (parts.size() > 1)
+			{
+				cout << "Invalid command!" << endl;
+			}
+			else
+			{
+				if (books.getFilepath().size())
+				{
+					books.saveFile();
+				}
+				else
+				{
+					cout << "Filename: ";
+					getline(cin, line);
+					books.saveFile(line);
+				}
 			}
 		}
 		else if (parts[0] == "saveAs")
 		{
-			if (parts.size() >= 2)
+			if (parts.size() > 2)
+			{
+				cout << "Too many arguments!" << endl;
+			}
+			else if (parts.size() == 2)
 			{
 				books.saveFile(parts[1]);
 			}
@@ -175,44 +223,69 @@ void Manager::commands()
 		}
 		else if (parts[0] == "booksAdd")
 		{
-			if (user && user->getIsAdmin())
+			if (parts.size() > 1)
 			{
-				Book book;
-				book.input();
-				books.addBook(book);
+				cout << "Invalid command!" << endl;
 			}
 			else
 			{
-				cout << "Only admin can add new books!" << endl;
+				if (loggedUser && loggedUser->getIsAdmin())
+				{
+					Book book;
+					book.input();
+					books.addBook(book);
+				}
+				else
+				{
+					cout << "Only admin can add new books!" << endl;
+				}
 			}
 		}
 		else if (parts[0] == "booksAll")
 		{
-			if (user)
+			if (parts.size() > 1)
 			{
-				books.printAll();
+				cout << "Invalid command!" << endl;
 			}
 			else
 			{
-				cout << "You have to be logged in to view books!" << endl;
+				if (loggedUser)
+				{
+					books.printAll();
+				}
+				else
+				{
+					cout << "You have to be logged in to view books!" << endl;
+				}
 			}
 		}
 		else if (parts[0] == "booksView")
 		{
-			if (user)
+			if (parts.size() > 1)
 			{
-				books.printView();
+				cout << "Invalid command!" << endl;
 			}
 			else
 			{
-				cout << "You have to be logged in to view books!" << endl;
+				if (loggedUser)
+				{
+					books.printView();
+				}
+				else
+				{
+					cout << "You have to be logged in to view books!" << endl;
+				}
 			}
 		}
 		else if (parts[0] == "booksInfo")
 		{
-			if (user)
+			if (loggedUser)
 			{
-				if (parts.size() >= 2)
+				if (parts.size() > 2)
+				{
+					cout << "Too many arguments!" << endl;
+				}
+				else if (parts.size() == 2)
 				{
 					int isbn = atoi(parts[1].c_str());
 					Book* book = books.getByISBN(isbn);
@@ -237,17 +310,17 @@ void Manager::commands()
 		}
 		else if (parts[0] == "booksFind")
 		{
-			if (user)
+			if (loggedUser)
 			{
 				if (parts.size() >= 3)
 				{
 					Book* book;
 					string arg = parts[2];
+					bool error = false;
 					for (size_t i = 3; i < parts.size(); i++)
 					{
-						arg += " " + parts[i];
-					}
-					bool error = false;
+						arg += " " + parts[i]; // Слива всички части от реда започвайки от позиция 2
+					}                          
 					if (parts[1] == "title")
 					{
 						book = books.getByTitle(arg);
@@ -260,7 +333,7 @@ void Manager::commands()
 					{
 						book = books.getByTag(arg);
 					}
-					else
+					else // Ако напишем нещо, което не е автор, заглавие или таг
 					{
 						error = true;
 						cout << "Invalid search criteria!" << endl;
@@ -290,9 +363,10 @@ void Manager::commands()
 		}
 		else if (parts[0] == "booksRemove")
 		{
-			if (user && user->getIsAdmin())
+			if (loggedUser && loggedUser->getIsAdmin())
 			{
-				if (parts.size() >= 2)
+				
+			    if (parts.size() >= 2)
 				{
 					int isbn = atoi(parts[1].c_str());
 					bool isRemoved = books.removeByISBN(isbn);
@@ -307,7 +381,7 @@ void Manager::commands()
 				}
 				else
 				{
-					cout << "Please input a ISBN!" << endl;
+					cout << "Please input an ISBN!" << endl;
 				}
 			}
 			else
@@ -315,59 +389,70 @@ void Manager::commands()
 				cout << "Only admin can remove books!" << endl;
 			}
 		}
-		else if (parts[0] == "booksSort")
+		else if (parts[0] == "booksSort") 
 		{
-			if (user)
+			if (loggedUser)
 			{
-				if (parts.size() >= 2)
+				if (books.getCount()) // Ако има книги
 				{
-					bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
-					if (parts[1] == "title")
+					if (parts.size() > 3)
 					{
-						cmpFunction = booksTitleCmp;
+						cout << "Too many agruments!" << endl;
 					}
-					else if (parts[1] == "author")
+					else if (parts.size() >= 2)
 					{
-						cmpFunction = booksAuthorCmp;
-					}
-					else if (parts[1] == "year")
-					{
-						cmpFunction = booksYearCmp;
-					}
-					else if (parts[1] == "rating")
-					{
-						cmpFunction = booksRatingCmp;
-					}
-
-					bool desc = false;
-					if (parts.size() >= 3)
-					{
-						if (parts[2] == "asc")
+						bool (*cmpFunction)(const Book * a, const Book * b) = nullptr;
+						if (parts[1] == "title")
 						{
-							desc = false;
+							cmpFunction = booksTitleCmp;
 						}
-						else if (parts[2] == "desc")
+						else if (parts[1] == "author")
 						{
-							desc = true;
+							cmpFunction = booksAuthorCmp;
+						}
+						else if (parts[1] == "year")
+						{
+							cmpFunction = booksYearCmp;
+						}
+						else if (parts[1] == "rating")
+						{
+							cmpFunction = booksRatingCmp;
+						}
+
+						bool desc = false;
+						if (parts.size() >= 3)
+						{
+							if (parts[2] == "asc")
+							{
+								desc = false;
+							}
+							else if (parts[2] == "desc")
+							{
+								desc = true;
+							}
+							else // Когато не е валиден parts[2]
+							{
+								cmpFunction = nullptr; // за да не се пуска booksSort
+							}
+						}
+						if (cmpFunction)
+						{
+							books.booksSort(cmpFunction, desc);
+							cout << "Books sorted!" << endl;
 						}
 						else
 						{
-							cmpFunction = nullptr; // за да не се пуска booksSort
+							cout << "Not a valid sorting method!" << endl;
 						}
-					}
-					if (cmpFunction)
-					{
-						books.booksSort(cmpFunction, desc);
-						cout << "Books sorted!" << endl;
 					}
 					else
 					{
-						cout << "Not a valid sorting method!" << endl;
+						cout << "Please choose sorting method!" << endl;
 					}
 				}
 				else
 				{
-					cout << "Please choose sorting method!" << endl;
+					cout << "No books to be sorted!" << endl;
 				}
 			}
 			else
@@ -377,23 +462,30 @@ void Manager::commands()
 		}
 		else if (parts[0] == "help")
 		{
-			cout << "login - logs in an user" << endl;
-			cout << "logout - logs out an user" << endl;
-			cout << "open <FILEPATH> - opens a book file" << endl;
-			cout << "close - closes the current book file" << endl; 
-			cout << "save - saves the current book file" << endl; 
-			cout << "saveAs <FILEPATH> - saves the current book file in a new location" << endl; 
-			cout << "booksAdd - adds a new book" << endl; 
-			cout << "booksRemove <ISBN> - removes a book" << endl; 
-			cout << "booksAll - displays all books" << endl; 
-			cout << "booksView - displays detailed information of all books" << endl; 
-			cout << "booksInfo <ISBN> - displays book" << endl; 
-			cout << "booksFind <title|author|tag> <SEARCH> - finds a book" << endl; 
-			cout << "booksSort <title|author|year|rating> [asc|desc] - sort books" << endl; 
-			cout << "usersAdd <USERNAME> <PASSWORD> - adds a new user" << endl; 
-			cout << "usersRemove <USERNAME> - removes a user" << endl; 
-			cout << "help - displays all commands and their capabilities" << endl; 
-			cout << "exit - closes the program" << endl; 
+			if (parts.size() > 1)
+			{
+				cout << "Invalid command!" << endl;
+			}
+			else
+			{
+				cout << "login - logs in an user" << endl;
+				cout << "logout - logs out an user" << endl;
+				cout << "open <FILEPATH> - opens a book file" << endl;
+				cout << "close - closes the current book file" << endl;
+				cout << "save - saves the current book file" << endl;
+				cout << "saveAs <FILEPATH> - saves the current book file in a new location" << endl;
+				cout << "booksAdd - adds a new book" << endl;
+				cout << "booksRemove <ISBN> - removes a book" << endl;
+				cout << "booksAll - displays all books" << endl;
+				cout << "booksView - displays detailed information of all books" << endl;
+				cout << "booksInfo <ISBN> - displays book" << endl;
+				cout << "booksFind <title|author|tag> <SEARCH> - finds a book" << endl;
+				cout << "booksSort <title|author|year|rating> [asc|desc] - sort books" << endl;
+				cout << "usersAdd <USERNAME> <PASSWORD> - adds a new user" << endl;
+				cout << "usersRemove <USERNAME> - removes a user" << endl;
+				cout << "help - displays all commands and their capabilities" << endl;
+				cout << "exit - closes the program" << endl;
+			}
 		}
 		else if (parts[0] == "exit")
 		{
@@ -407,28 +499,30 @@ void Manager::commands()
 	while (true);
 }
 
-vector<string> Manager::splitLine(string line)
+vector<string> Manager::splitLine(string line) // Разбива реда на отделни думи
 {
 	vector<string> vec;
-	while (line.size())
-	{
+	while (line.size()) 
+	{ 
 		size_t pos = line.find(' ');
-		while (pos == 0)
+		while (pos == 0) // Премахва празното разстояние преди най-лявата дума от реда
 		{
-			line = line.substr(1); //Отзярва разтоянието преди текста
+			line = line.substr(1); // Отзярва празното разстоянието преди текста, ако случайно има такова
 			pos = line.find(' ');
 		}
-		if (pos == -1)
+		if (pos == -1) // Ако няма повече празни разстояния
 		{
-			vec.push_back(line);
-			line.clear();
+			if (line.size()) // Ако е останало нещо в реда след премахване на празните разстояния, тогава го добавяме в масива
+			{
+				vec.push_back(line); // Добавя последната дума от реда в края на масива
+				line.clear(); // Премахва последната дума от реда
+			}
 		}
-		else
+		else // Ако е намерило празно разстояние след най-лявата дума
 		{
-			string part = line.substr(0, pos); // Взима line от началото до празното разтояние
-			"red blue";
-			vec.push_back(part);
-			line = line.substr(pos + 1); //Взимаме от празното разтояние до края
+			string part = line.substr(0, pos); // Взима най-лявата дума от реда
+			vec.push_back(part); // Слага най-лявата дума в масива
+			line = line.substr(pos + 1); // Премахва най-лявата дума от реда
 		}
 	}
 	return vec;

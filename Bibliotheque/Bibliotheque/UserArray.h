@@ -8,11 +8,13 @@ using namespace std;
 class UserArray
 {
 public:
+	// Голяма четворка
 	UserArray(const string& filepath);
 	UserArray(const UserArray& other);
 	UserArray& operator=(const UserArray& other);
 	~UserArray();
 
+	// Методи
 	void addUser(const User& user);
 	void openFile(const string& filepath);
 	void saveFile() const;
@@ -23,10 +25,11 @@ public:
 	void print() const;
 
 private:
-	std::vector<User*> users;
-
+	// Член данни
+	vector<User*> users;
 	string filepath;
 
+	// Помощни функции
 	void copy(const UserArray& other);
 	void clear();
 };

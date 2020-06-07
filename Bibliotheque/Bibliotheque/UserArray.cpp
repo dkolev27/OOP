@@ -2,6 +2,8 @@
 #include <fstream>
 #include "UserArray.h"
 
+using namespace std;
+
 UserArray::UserArray(const string& filepath)
 {
 	this->filepath = filepath;
@@ -10,6 +12,7 @@ UserArray::UserArray(const string& filepath)
 	{
 		User admin("admin", "i<3c++", true);
 		addUser(admin);
+		saveFile();
 	}
 }
 
@@ -40,7 +43,7 @@ void UserArray::addUser(const User& user)
 
 void UserArray::openFile(const string& filepath)
 {
-	std::ifstream file(filepath);
+	ifstream file(filepath);
 	if (file)
 	{
 		clear();
@@ -100,7 +103,7 @@ bool UserArray::removeUser(const string& username)
 
 void UserArray::saveFile() const
 {
-	std::ofstream file(filepath);
+	ofstream file(filepath);
 	if (file)
 	{
 		for (size_t i = 0; i < users.size(); i++)
@@ -116,7 +119,7 @@ void UserArray::print() const
 {
 	for (size_t i = 0; i < users.size(); i++)
 	{
-		std::cout << *users[i];
+		cout << *users[i];
 	}
 }
 

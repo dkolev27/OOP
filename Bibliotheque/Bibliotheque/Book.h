@@ -7,19 +7,21 @@ using namespace std;
 class Book
 {
 public:
-	//Big four + param. c-tor
+	// Голяма четворка с параметризиран конструктор
 	Book(const string& author = "", const string& title = "", const string& genre = "", const string& short_discription = "", unsigned year = 0, const string& keywords = "", float rating = 0, int bibliotheque_unique_number = 0);
 	Book(const Book& other);
 	Book& operator=(const Book& other);
 	~Book();
 
+	// Функции за въвеждане и за принтиране
 	void input(); 
 	void print();
 
+	// Приятелски функции, които четат и записват във файл
 	friend std::istream& operator>>(std::istream& in, Book& book); 
 	friend std::ostream& operator<<(std::ostream& out, Book& book); 
 
-	//Setters & Getters
+	// Селектори и мутатори
 	void setAuthor(const string& author);
 	string getAuthor() const;
 	void setTitle(const string& title);
@@ -35,10 +37,10 @@ public:
 	void setRating(float rating);
 	float getRating() const;
 	void setBibliothequeUniqueNumber(int bibliotheque_unique_number);
-	int getBibliothequeUniqueNumberr() const;
+	int getBibliothequeUniqueNumber() const;
 
 private:
-	//Fields
+	// Член данни
 	string author;
 	string title;
 	string genre;
@@ -48,11 +50,12 @@ private:
 	float rating;
 	int bibliotheque_unique_number;
 
-	//Helper methods
+	// Помощни функции на голямата четворка
 	void clear();
 	void copy(const Book& other);
 };
 
+// Функции, които сравняват по различни критерии (използват се в сортиращия алгоритъм)
 bool booksYearCmp(const Book* a, const Book* b);
 bool booksAuthorCmp(const Book* a, const Book* b);
 bool booksTitleCmp(const Book* a, const Book* b);
